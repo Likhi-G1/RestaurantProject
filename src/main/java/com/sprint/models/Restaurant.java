@@ -3,24 +3,19 @@ package com.sprint.models;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.util.List;
-import java.util.Set;
-
 import javax.persistence.*;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
 @Table(name = "restaurant")
 public class Restaurant {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	
 	@Column(name="restaurant_id")
 	private long restaurantId;
 	
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name= "table_number")
 	private int tableNumber;
 	

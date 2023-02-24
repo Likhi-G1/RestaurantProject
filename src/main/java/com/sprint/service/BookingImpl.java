@@ -1,7 +1,6 @@
 package com.sprint.service;
 
 import java.time.LocalDate;
-
 import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
@@ -11,9 +10,11 @@ import org.springframework.stereotype.Service;
 
 import com.sprint.exceptions.BookingNotFoundException;
 import com.sprint.exceptions.TransactionRecordNotFoundException;
+import com.sprint.dto.BookingDTO;
 import com.sprint.exceptions.BookingAlreadyExistsException;
 import com.sprint.models.Admin;
 import com.sprint.models.Booking;
+import com.sprint.models.Customer;
 import com.sprint.repository.BookingRepository;
 
 @Service
@@ -26,46 +27,53 @@ public class BookingImpl implements BookingService
 	}
 	
 	private Admin admin=new Admin();
-	//allow a customer
+	private Customer customer=new Customer();
 	
+	//allow a customer
 	@Override
-	public Booking createBooking(LocalDate date, int numberOfGuests) throws BookingAlreadyExistsException {
-		Optional<Booking> existingBooking = bookingRepository.findByDateAndNumberOfGuests(date, numberOfGuests);
-		Booking booking;
+	public BookingDTO createBooking(long custId,BookingDTO booking)throws BookingAlreadyExistsException {
+		Optional<Booking> existingBooking = bookingRepository.findByDateAndNumberOfGuests(booking.getDate(), booking.getNumberOfGuests());
+		Booking book;
 		if(existingBooking.isPresent()) {
 			throw new BookingAlreadyExistsException("Table is already booked for given date and party size");
-			//customer already exists exception
 			}
 		else
 		{
 		admin.setAdminId(1);
-		booking = new Booking();
-		booking.setDate(date);
-		booking.setTime(LocalTime.now());
-		booking.setAdmin(admin);
-		booking.setNumberOfGuests(numberOfGuests);
+		customer.setCustomerId(custId);
+		book = new Booking();
+		book.setId(booking.getId());
+		book.setDate(booking.getDate());
+		book.setTime(LocalTime.now());
+		book.setAdmin(admin);
+		book.setCustomer(customer);
+		book.setNumberOfGuests(booking.getNumberOfGuests());
+		
 		}
-		return bookingRepository.save(booking);
+		Booking b=bookingRepository.save(book);
+		booking.setId(book.getId());
+		return booking;
 	}
+
 	
 	public List<Booking> findBookingByDate(LocalDate date)throws TransactionRecordNotFoundException{
-		try
-		{
-		return bookingRepository.findByDate(date);
+		List<Booking>  existBooking = bookingRepository.findByDate(date);
+		if(existBooking.isEmpty()) {
+			throw new TransactionRecordNotFoundException("Booking records are not found for given date ");
 		}
-		catch(Exception e)
-		{
-			throw new TransactionRecordNotFoundException("Transaction records are not found for given date ");
+		else {
+			return bookingRepository.findByDate(date);
 		}
+}
 	
-	}
+
 	
 	@Override
-	public Booking updateBooking(long bookingId, LocalTime newTime) throws BookingNotFoundException 
+	public Booking updateBooking(long bookingId, LocalDate newDate) throws BookingNotFoundException 
 	{
 	
 	      Booking booking = bookingRepository.findById(bookingId).orElseThrow(() -> new BookingNotFoundException("Booking not found with ID: " + bookingId));
-	      booking.setTime(newTime);
+	      booking.setDate(newDate);
 	      return bookingRepository.save(booking);
 	}
 
@@ -78,11 +86,7 @@ public class BookingImpl implements BookingService
 		
 	}
 
-
 	
-//	@Override
-//	public List<Booking> getBookingsByCustomerId(Long customerId) {
-//		// TODO Auto-generated method stub
-//		return null;
-//	}
-}
+	}
+
+

@@ -1,7 +1,6 @@
 package com.sprint.models;
 
 import java.util.HashSet;
-
 import java.util.List;
 import java.util.Set;
 import javax.persistence.CascadeType;
@@ -16,7 +15,6 @@ import javax.persistence.JoinTable;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -44,8 +42,11 @@ private String customerName;
 @Column(name="phone_no")
 private long phoneNo;
 
-@Column(name="cost")
-private double cost;
+@Column(name="email_id")
+private String emailId;
+
+@Column(name="password")
+private String password;
 
 @JsonIgnoreProperties("customer")
 @ManyToMany(cascade = CascadeType.ALL)

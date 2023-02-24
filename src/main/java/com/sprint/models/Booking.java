@@ -1,13 +1,11 @@
 package com.sprint.models;
 
 import java.time.LocalDate;
+
 import java.time.LocalTime;
-import java.util.Date;
 import java.util.List;
 
 import javax.persistence.*;
-
-import org.springframework.format.annotation.DateTimeFormat;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
@@ -15,6 +13,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -36,6 +35,7 @@ private LocalTime time;
 @Column(name = "number_of_guests")
 private int numberOfGuests;
 
+
 @JsonIgnore
 @OneToMany(mappedBy = "booking", fetch = FetchType.LAZY)
 private List<Transaction> transaction;
@@ -44,7 +44,7 @@ private List<Transaction> transaction;
  @JoinColumn(name = "admin_id")
  private Admin admin;
 
-@ManyToOne(cascade=CascadeType.ALL)
+@ManyToOne(cascade=CascadeType.MERGE)
  @JoinColumn(name = "customer_id")
  private Customer customer;
 

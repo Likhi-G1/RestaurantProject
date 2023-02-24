@@ -5,6 +5,7 @@ public interface RestaurantService {
 	public void getTablesAvailableOnDateTime(Date date);
 	public void getTablesBySeating();
 	public void getAllAvailableTables();
+	public Restaurant createRestaurant(Restaurant restaurant);
 }
 
 

@@ -1,11 +1,11 @@
 package com.sprint.controllers;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.format.annotation.DateTimeFormat;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,9 +16,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.sprint.dto.BookingDTO;
+import com.sprint.dto.CustomerDTO;
 import com.sprint.exceptions.BookingAlreadyExistsException;
 import com.sprint.exceptions.BookingNotFoundException;
+import com.sprint.exceptions.CustomerAlreadyExistsException;
 import com.sprint.exceptions.CustomerNotFoundException;
+import com.sprint.exceptions.InvalidCredentialsException;
 import com.sprint.models.Booking;
 import com.sprint.models.Customer;
 import com.sprint.repository.CustomerRepository;
@@ -32,37 +36,38 @@ public class CustomerController {
 	private BookingService bookingService;
 	
 	@Autowired
-	private CustomerService customerService;
+	CustomerRepository customerRepository;
 	
 	@Autowired
-	CustomerRepository customerRepository;
+	private CustomerService customerService;
 	  
 		@Autowired
 	  public CustomerController(BookingService bookingService) {
 	    this.bookingService = bookingService;
 	  }
-	//@DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)	
-//		 @PostMapping("/book")
-//		   public Booking bookTable(@RequestParam("date") LocalDate date,
-//		                           @RequestParam("numberOfGuests") int numberOfGuests,
-//		                           Model model) {
-//		      Booking booking = bookingService.createBooking(date, numberOfGuests);
-//
-//		      model.addAttribute("booking", booking);
-//
-//		      return booking;
-//		   }
-		@PostMapping(value="/book/{date}/{g}")
-		public Booking bookTable(@PathVariable @DateTimeFormat(pattern="yyyy-MM-dd") LocalDate date,@PathVariable int g) throws BookingAlreadyExistsException
+		
+		@PostMapping("/register")
+		public ResponseEntity registerCustomer(@RequestBody CustomerDTO customer)throws CustomerAlreadyExistsException {
+			CustomerDTO usr= this.customerService.registerCustomer(customer);
+			return new ResponseEntity(usr, HttpStatus.CREATED);
+		}
+		
+		@PostMapping("/loginUser/{email}/{password}")
+		public String loginUser(@PathVariable String email,String password) throws InvalidCredentialsException{
+			return this.customerService.loginUser(email,password);
+			}
+	
+		@PostMapping(value="/{custId}/book")
+		public BookingDTO bookTable(@PathVariable long custId,@RequestBody BookingDTO booking) throws BookingAlreadyExistsException
 		{
-			return bookingService.createBooking(date, g);
+			return bookingService.createBooking(custId,booking);
 		}
 	  
 	  @PutMapping(value="/bookings/{bookingId}")
-	  public ResponseEntity<Booking> updateBooking(@PathVariable Long bookingId, @RequestBody LocalTime newTime) throws BookingNotFoundException{
+	  public ResponseEntity<Booking> updateBooking(@PathVariable Long bookingId, @RequestBody  LocalDate newDate) throws BookingNotFoundException{
 		   Booking updatedBooking = null;
 		
-			updatedBooking = bookingService.updateBooking(bookingId, newTime);
+			updatedBooking = bookingService.updateBooking(bookingId, newDate);
 		   return ResponseEntity.ok(updatedBooking);
 	  }
 	  
@@ -76,30 +81,10 @@ public class CustomerController {
 	  @GetMapping(value="/{id}")
 	  public Customer getCustomerById(@PathVariable Long id) throws CustomerNotFoundException{
         return customerService.findCustomerById(id);
-    }
-    
+    } 
 	  @GetMapping
 	  public List<Customer> getAllCustomers(){
         return customerService.getCustomers();
-    }
-	  
-//    @GetMapping(value="/name/{name}")
-//    public List<Customer> getCustomerByName(@PathVariable String name){
-//        return customerService.findCustomerByName(name);
-//    }
-    
-  //Display a list of customers ordered by frequency of visits
-//  @GetMapping(value="/frequency")
-//  public List<Customer> getAllCustomersOrderByCountBookings(){
-//      return customerRepository.findAllByBookings();
-//  }
-	  
-	  
-
-
-//
-//    
-//    
-//    
+    }  
 
 }
