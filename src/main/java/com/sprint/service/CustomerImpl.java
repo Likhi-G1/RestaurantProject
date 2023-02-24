@@ -25,6 +25,7 @@ import com.sprint.repository.CustomerRepository;
 @Service
 public class CustomerImpl implements CustomerService{
 	
+	@Autowired
 	private BookingRepository bookingRepository;
 	
 	@Autowired
@@ -80,7 +81,7 @@ public class CustomerImpl implements CustomerService{
 
 	public Customer findCustomerById(long customerId) throws CustomerNotFoundException {
 		Customer customer;
-		if(customerRepository.findById(customerId).isEmpty) {
+		if(customerRepository.findById(customerId).isEmpty()) {
 			throw new CustomerNotFoundException("Customer with given Id is not present");
 		}
 		else {
