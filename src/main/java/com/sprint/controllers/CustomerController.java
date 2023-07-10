@@ -58,7 +58,7 @@ public class CustomerController {
 	    this.bookingService = bookingService;
 	  }
 		
-		@PostMapping("/registerlikhitha")
+		@PostMapping("/registerlikhithajallipalli")
 		public ResponseEntity<CustomerDTO> registerCustomer(@RequestBody CustomerDTO customer)throws CustomerAlreadyExistsException {
 			CustomerDTO usr= this.customerService.registerCustomer(customer);
 			return new ResponseEntity<>(usr, HttpStatus.CREATED);
