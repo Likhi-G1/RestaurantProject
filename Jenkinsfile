@@ -9,7 +9,7 @@ pipeline {
 
         // Build your Spring Boot application
         sh 'mvn clean'
-        sh 'mvn install -DskipTests'
+        sh 'mvn install'
       }
     }
 
