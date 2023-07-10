@@ -5,11 +5,10 @@ pipeline {
     stage('Build') {
       steps {
         // Checkout your source code from GitHub
-        git 'https://github.com/Likhi-G1/RestaurantProject.git'
+        git 'https://github.com/HaneeshDevops/ecomapp.git'
 
         // Build your Spring Boot application
-        sh 'mvn clean'
-        sh 'mvn install'
+        sh 'mvn clean install'
       }
     }
 
@@ -20,27 +19,37 @@ pipeline {
       }
     }
 
+    stage('Docker Build and Push') {
+      steps {
+        // Build the Docker image
+        sh 'docker build --no-cache -t haneeshdevops/ecomapp:latest .'
+
+        // Push the Docker image to Docker Hub
+        sh 'docker login -u haneeshdevops -p intMega@95422'
+        sh 'docker push haneeshdevops/ecomapp:latest'
+      }
+    }
+
     stage('Deploy') {
       environment {
-        CONTAINER_NAME = 'restaurantproject'
+        CONTAINER_NAME = 'ecomapp'
+        
       }
       steps {
-        // Stop and remove the existing EcomApp container if it is running
-        sh 'docker stop ${CONTAINER_NAME} || true'
-        sh 'docker rm ${CONTAINER_NAME} || true'
+        // Set up Kubernetes context using kubeconfig
+        withKubeConfig([credentialsId: 'k8sgroup']) {
+          // Deploy the application to Kubernetes using the deployment YAML file
+          sh 'kubectl apply -f application-deployment.yml'
 
-        // Delete the EcomApp image if it exists
-        sh 'docker rmi ${CONTAINER_NAME} || true'
+          // Start the service
+          sh 'kubectl apply -f application-service.yml'
 
-        // Build the Docker image
-        sh 'docker build --no-cache -t likhi1/restaurantproject:latest .'
+          // Restart the deployment to apply the changes
+          sh 'kubectl rollout restart deployment javapp'
 
-        // rUN THE DOKCER IMAGE
-        sh 'docker run -d -p 8081:8081 likhi1/restaurantproject'
-        
-        // Push the Docker image to Docker Hub
-       // sh 'docker login -u likhi1 -p Likhi@123'
-        // sh 'docker push likhi1/restaurantproject:latest'
+          // Create a service to expose the application
+          // sh 'kubectl expose deployment/${CONTAINER_NAME} --port=8084 --target-port=8084 --type=LoadBalancer --name=${CONTAINER_NAME}'
+        }
       }
     }
   }
