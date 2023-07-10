@@ -36,7 +36,7 @@ pipeline {
         sh 'docker build --no-cache -t likhi1/restaurantproject:latest .'
 
         // rUN THE DOKCER IMAGE
-        sh 'docker run restaurantproject'
+        sh 'docker run likhi1/restaurantproject'
         
         // Push the Docker image to Docker Hub
        // sh 'docker login -u likhi1 -p Likhi@123'
